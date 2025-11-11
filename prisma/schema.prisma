@@ -1,0 +1,279 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model nokta_kategoriler {
+  id            Int      @id @default(autoincrement())
+  KategoriAdiTr String?  @db.VarChar(250)
+  KategoriAdiEn String?  @db.VarChar(250)
+  sira          Int?
+  parent_id     Int?
+  old_id        Int?
+  is_active     Boolean?
+  marka_id      Int?
+  img_path      String?  @db.VarChar(250)
+  seo_link      String?  @unique(map: "seo_link") @db.VarChar(250)
+
+  @@index([sira], map: "idx_kategori_sira")
+  @@index([parent_id, is_active], map: "idx_parent_active")
+}
+
+model nokta_urun_markalar {
+  id        Int      @id @default(autoincrement())
+  title     String?  @db.VarChar(250)
+  is_active Boolean?
+  order_by  Int?
+  link_img  String?  @db.VarChar(250)
+  hover_img String?  @db.VarChar(250)
+  seo_link  String?  @db.VarChar(255)
+  web_net   Boolean
+  web_comtr Boolean
+  web_cn    Boolean
+  urunler       nokta_urunler[] @relation("UrunMarka")
+}
+
+model nokta_urunler {
+  id            Int       @id @default(autoincrement())
+  BLKODU        Int?
+  UrunKodu      String?   @db.VarChar(256)
+  UrunAdiTR     String?   @db.VarChar(256)
+  UrunAdiEN     String?   @db.VarChar(256)
+  OzelliklerTR  String?   @db.LongText
+  OzelliklerEN  String?   @db.LongText
+  BilgiTR       String?   @db.LongText
+  BilgiEN       String?   @db.LongText
+  KategoriID    Int?
+  MarkaID       Int?
+  barkod        String?   @db.VarChar(255)
+  Vitrin        Boolean?
+  YeniUrun      Boolean?
+  KSF4          Decimal?  @db.Decimal(13, 4)
+  KSF3          Decimal?  @db.Decimal(13, 4)
+  KSF2          Decimal?  @db.Decimal(13, 4)
+  KSF1          Decimal?  @db.Decimal(13, 4)
+  DSF4          Decimal?  @db.Decimal(13, 4)
+  DSF3          Decimal?  @db.Decimal(13, 4)
+  DSF2          Decimal?  @db.Decimal(13, 4)
+  DSF1          Decimal?  @db.Decimal(13, 4)
+  DOVIZ_KULLAN  String?   @db.Text
+  DOVIZ_BIRIMI  String?   @db.Text
+  stok          String?   @db.Text
+  birim         String?   @db.Text
+  kdv           String?   @db.Text
+  desi          Decimal?  @db.Decimal(13, 4)
+  proje         Int?
+  web_net       Boolean
+  web_comtr     Boolean
+  web_cn        Boolean
+  tags          String?   @db.LongText
+  aktif         Boolean?
+  sira          Int?
+  create_date   DateTime? @db.DateTime(0)
+  modify_date   DateTime? @db.DateTime(0)
+  UygulamalarTr String?   @db.LongText
+  UygulamalarEn String?   @db.LongText
+  seo_link      String?   @unique(map: "seo_link") @db.VarChar(255)
+  cok_satan     Int?
+  cok_goren     Int?
+  marka         nokta_urun_markalar? @relation("UrunMarka", fields: [MarkaID], references: [id])
+  resimler      nokta_urunler_resimler[] @relation("UrunResimler")
+}
+
+model nokta_urunler_resimler {
+  id     Int     @id @default(autoincrement())
+  BResim String? @db.VarChar(250)
+  KResim String? @db.VarChar(250)
+  UrunID Int?
+  Sira   Int?
+  urun   nokta_urunler? @relation("UrunResimler", fields: [UrunID], references: [id])
+
+  @@index([UrunID, Sira], map: "idx_urun_sira")
+}
+
+model indata_projects {
+  id             Int       @id @default(autoincrement())
+  p_name         String?   @db.Text
+  p_desc         String?   @db.Text
+  date           String?   @db.Text
+  p_image        String?   @db.Text
+  p_shortdesc    String?   @db.Text
+  aktif          Int?
+
+}
+
+model nokta_urunler_yuklemeler {
+  id         Int       @id @default(autoincrement())
+  aciklama   String?   @db.LongText
+  aciklamaEn String?   @db.LongText
+  url_path   String?   @db.VarChar(500)
+  dosya_adi  String?   @db.VarChar(75)
+  order_by   Int?
+  is_active  Boolean?
+  version    String?   @db.VarChar(50)
+  type       String?   @db.VarChar(50)
+  datetime   DateTime? @db.DateTime(0)
+  urun_id    Int?
+  yukleme_id Int?
+}
+
+model nokta_yukleme_dosya_tipleri {
+  id       Int     @id
+  type     String? @db.VarChar(150)
+  img_path String? @db.VarChar(150)
+  baslik   String? @db.VarChar(250)
+}
+
+model nokta_yuklemeler {
+  id         Int      @id
+  baslik     String?  @db.VarChar(250)
+  baslikEn   String?  @db.VarChar(250)
+  dosya_yolu String?  @db.VarChar(250)
+  order_by   Int?
+  is_active  Boolean?
+}
+
+model net_offers {
+  id          Int      @id @default(autoincrement())
+  name        String?  @db.VarChar(255)
+  company     String?  @db.VarChar(255)
+  phone       String?  @db.VarChar(255)
+  mail        String?  @db.VarChar(255)
+  description String?  @db.VarChar(255)
+  prod_id     Int?
+  date        DateTime @default(now()) @db.Timestamp(0)
+}
+
+model nokta_ebulten {
+  id          Int      @id @default(autoincrement())
+  email       String?  @db.VarChar(255)
+  create_date DateTime @default(now()) @db.Timestamp(0)
+}
+
+model category_brand_rel {
+  id       Int  @id @default(autoincrement())
+  marka_id Int?
+  kat_id   Int?
+}
+
+model category_product_rel {
+  id     Int  @id @default(autoincrement())
+  p_id   Int?
+  cat_id Int?
+}
+
+model slider {
+  id        Int      @id @default(autoincrement())
+  link      String?  @db.MediumText
+  photo     String?  @db.MediumText
+  is_active Int
+  order_by  Int?
+  date      DateTime @default(now()) @db.Timestamp(0)
+}
+
+model catalogs {
+  id        Int     @id @default(autoincrement())
+  title     String? @db.VarChar(255)
+  file      String? @db.VarChar(255)
+  web_net   Int?
+  web_comtr Int?
+  web_cn    Int?
+}
+
+model category_filter_rel {
+  id              Int  @id @default(autoincrement())
+  category_id     Int?
+  filter_title_id Int?
+}
+
+model documents {
+  id     Int     @id @default(autoincrement())
+  title  String? @db.VarChar(255)
+  text   String? @db.Text
+  site   String? @db.VarChar(255)
+  status Int?
+  type   String? @db.VarChar(255)
+}
+
+model filter_title {
+  id       Int     @id @default(autoincrement())
+  title    String? @db.VarChar(255)
+  title_en String? @db.VarChar(255)
+}
+
+model filter_value {
+  id              Int     @id @default(autoincrement())
+  filter_title_id Int?
+  name            String? @db.VarChar(255)
+  name_cn         String? @db.VarChar(255)
+}
+
+model net_newsletter {
+  id   Int      @id @default(autoincrement())
+  mail String?  @db.VarChar(255)
+  date DateTime @default(now()) @db.Timestamp(0)
+}
+
+model permissions {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique(map: "name") @db.VarChar(50)
+  parent_id   Int
+  description String?   @db.VarChar(255)
+  created_at  DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model products_filter_rel {
+  id              Int  @id @default(autoincrement())
+  product_id      Int?
+  filter_value_id Int?
+}
+
+model settings {
+  id         Int     @id @default(autoincrement())
+  company    String? @db.VarChar(150)
+  mail       String? @db.VarChar(100)
+  phone      String? @db.VarChar(100)
+  fax        String? @db.VarChar(100)
+  facebook   String? @db.VarChar(255)
+  twitter    String? @db.VarChar(255)
+  instagram  String? @db.VarChar(255)
+  linkedin   String? @db.VarChar(255)
+  youtube    String? @db.VarChar(255)
+  logo       String? @db.VarChar(255)
+  logo_white String? @db.VarChar(255)
+  favicon    String? @db.VarChar(255)
+}
+
+model user_permissions {
+  id            Int @id @default(autoincrement())
+  user_id       Int
+  permission_id Int
+
+  @@unique([user_id, permission_id], map: "user_id")
+  @@index([permission_id], map: "permission_id")
+}
+
+model user_roles {
+  id      Int @id @default(autoincrement())
+  user_id Int
+  role_id Int
+
+  @@unique([user_id, role_id], map: "user_id")
+  @@index([role_id], map: "role_id")
+}
+
+model users {
+  id         Int       @id @default(autoincrement())
+  username   String?   @db.VarChar(255)
+  email      String?   @db.VarChar(255)
+  password   String?   @db.VarChar(255)
+  full_name  String?   @db.VarChar(100)
+  roles      Int?
+  is_active  Boolean?  @default(true)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  updated_at DateTime? @default(now()) @db.Timestamp(0)
+}
