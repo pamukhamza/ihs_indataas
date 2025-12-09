@@ -2,6 +2,7 @@ const path = require('path')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   images: {
     domains: ['noktanet.s3.eu-central-1.amazonaws.com'],
   },
@@ -12,3 +13,4 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
+
